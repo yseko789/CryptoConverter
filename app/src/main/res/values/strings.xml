@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CryptoConverter</string>
+
+    <string name = "search_placeholder">Bitcoin...</string>
+</resources>
