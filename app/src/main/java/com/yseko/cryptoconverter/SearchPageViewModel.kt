@@ -1,6 +1,7 @@
 package com.yseko.cryptoconverter
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.yseko.cryptoconverter.network.Coin
 import androidx.lifecycle.viewModelScope
@@ -11,23 +12,17 @@ import kotlinx.coroutines.launch
 
 class SearchPageViewModel: ViewModel() {
     var searchInput by mutableStateOf("")
-//    private val _searchResult = getCoins().toMutableStateList()
-//    val searchResult: List<Coin> get() = _searchResult
+//    private val _searchPrices = MutableList(15){0.0}.toMutableStateList()
+//    val searchPrices: SnapshotStateList<Double> get() = _searchPrices
 
     val searchResult = mutableStateListOf<Coin>()
-    val searchPrices = mutableStateListOf<Price>()
+//    val searchPrices = mutableStateListOf<Double>()
+
+
 
     fun updateSearch(inputString: String){
         searchInput = inputString
-        println(searchInput)
         getCoins()
-        var priceSearch = ""
-        for(i in searchResult){
-            priceSearch+=i.id
-            priceSearch+="%2C"
-        }
-        println(priceSearch)
-        getCoinPrice(priceSearch)
     }
 
 //    fun getCoins(): List<Coin>{
@@ -44,7 +39,6 @@ class SearchPageViewModel: ViewModel() {
 //    }
 
     fun getCoins(){
-//        var results: List<Coin> = emptyList()
         viewModelScope.launch {
             try {
                 searchResult.clear()
@@ -54,17 +48,44 @@ class SearchPageViewModel: ViewModel() {
             }
         }
     }
+//
+//    fun getCoinPrice(id: String){
+//        viewModelScope.launch {
+//            try{
+//                searchPrices.clear()
+//                searchPrices.addAll(GeckoApi.retrofitService.getPrice(id, "usd").prices.values)
+//            }catch (e: Exception){
+//                println(e)
+//            }
+//        }
+//    }
 
-    fun getCoinPrice(id: String){
-        viewModelScope.launch {
-            try{
-                searchPrices.clear()
-                searchPrices.addAll(GeckoApi.retrofitService.getPrice(id, "usd").prices.values)
-            }catch (e: Exception){
-                println(e)
-            }
-        }
-    }
+//    fun getInfo(inputString: String){
+//        searchInput = inputString
+//        viewModelScope.launch {
+//            try{
+//                searchResult.clear()
+//                searchResult.addAll(GeckoApi.retrofitService.getCoins(searchInput).coins.take(15))
+//                println(searchResult.size)
+//                var priceSearch = ""
+//                for(i in searchResult.indices){
+//                    priceSearch += searchResult[i].id
+//                    priceSearch +=","
+//                }
+//                println(priceSearch)
+////                searchPrices.clear()
+//                searchPrices.addAll(GeckoApi.retrofitService.getPrice(priceSearch, "usd").values.map{it.usd})
+////                for(i in searchPrices.size..15){
+////                    searchPrices.add(0.0)
+////                }
+////                println(searchPrices.size)
+//            }catch (e: Exception){
+//                println(e)
+//            }
+//        }
+//    }
+
+
 
 
 }

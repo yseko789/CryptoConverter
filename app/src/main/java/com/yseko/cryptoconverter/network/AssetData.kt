@@ -15,9 +15,9 @@ data class Coin(
     @Json(name = "market_cap_rank") val marketCapRank: Int?=null
 )
 
-data class ResponsePrices(
-    val prices: Map<String,Price>
-)
+//data class ResponsePrices(
+//    val prices: Map<String,Price>
+//)
 
 data class Price(
     val usd: Double

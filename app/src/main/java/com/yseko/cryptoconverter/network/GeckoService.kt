@@ -28,7 +28,7 @@ interface GeckoService {
     suspend fun getPrice(
         @Query("ids") ids: String,
         @Query("vs_currencies")vsCurrency: String
-    ): ResponsePrices
+    ): Map<String, Price>
 
 
 }
