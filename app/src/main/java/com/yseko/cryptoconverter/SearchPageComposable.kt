@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yseko.cryptoconverter.network.Coin
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.yseko.cryptoconverter.network.Price
 
@@ -172,29 +173,21 @@ fun SearchScreen(
     modifier: Modifier = Modifier
 ){
     viewModel.getCoins()
-
-    Scaffold(
-        bottomBar = {
-            BottomNavigation() {
-                
-            }
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .background(color = Color.Black)
+            .padding(20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .background(color = Color.Black)
-                .padding(20.dp)
-        ) {
-            CryptoSearchBar(
-                viewModel.searchInput,
-                { input -> viewModel.updateSearch(input) },
-                Modifier.padding(bottom = 20.dp)
-            )
-            CryptoList(viewModel.searchResult)
+        CryptoSearchBar(
+            viewModel.searchInput,
+            { input -> viewModel.updateSearch(input) },
+            Modifier.padding(bottom = 20.dp)
+        )
+        CryptoList(viewModel.searchResult)
 
-        }
     }
+
 }
 
 
