@@ -22,3 +22,4 @@ data class Coin(
 data class Price(
     val usd: Double
 )
+

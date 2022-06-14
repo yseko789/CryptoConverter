@@ -215,10 +215,10 @@ fun SearchScreen(
 //    }
 //}
 //
-//@Preview(showBackground = true)
-//@Composable
-//fun SearchScreenPreview() {
-//    CryptoConverterTheme {
-//        SearchScreen()
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun SearchScreenPreview() {
+    CryptoConverterTheme {
+        SearchScreen()
+    }
+}
