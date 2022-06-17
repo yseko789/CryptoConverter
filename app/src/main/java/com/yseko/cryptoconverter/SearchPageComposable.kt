@@ -1,5 +1,6 @@
 package com.yseko.cryptoconverter
 
+import android.media.MediaCodec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,11 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yseko.cryptoconverter.ui.theme.CryptoConverterTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.yseko.cryptoconverter.network.Coin
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.yseko.cryptoconverter.network.InfoData
+
+import com.yseko.cryptoconverter.network.LatestData
 import com.yseko.cryptoconverter.network.Price
 
 
@@ -65,29 +68,21 @@ fun CryptoSearchBar(
     )
 }
 
-//@Composable
-//fun CryptoList(
-//    modifier: Modifier = Modifier
-//){
-//    Column(
-//        modifier = modifier
-//    ) {
-//        for(i in 1..3){
-//            CryptoItem()
-//        }
-//    }
-//}
+
 @Composable
 fun CryptoList(
-    results: List<Coin>,
-//    prices: List<Double>,
+    results: List<LatestData>,
+//    infos: List<InfoData>,
     modifier: Modifier = Modifier
 ){
     LazyColumn{
 //        items(results){result->
 //            CryptoItem(result, prices[results.indexOf(result)])
         items(results){result->
-            CryptoItem(result = result)
+            CryptoItem(
+                result = result,
+//                image = infos.first{it.id == result.id}.logo
+            )
 
 
         }
@@ -96,8 +91,8 @@ fun CryptoList(
 
 @Composable
 fun CryptoItem(
-    result: Coin,
-//    price: Double,
+    result: LatestData,
+//    image: String,
     modifier: Modifier = Modifier
 ){
     Row(
@@ -110,16 +105,16 @@ fun CryptoItem(
             .background(color = Color.Red)
 
     ){
-        Image(
-            //need to use coil to get images from internet
-//            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            painter = rememberAsyncImagePainter(model = result.thumb),
-            contentDescription = "icon",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .weight(1f)
-                .padding(10.dp)
-        )
+//        Image(
+//            //need to use coil to get images from internet
+////            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+//            painter = rememberAsyncImagePainter(model = image),
+//            contentDescription = "icon",
+//            contentScale = ContentScale.FillWidth,
+//            modifier = Modifier
+//                .weight(1f)
+//                .padding(10.dp)
+//        )
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -147,7 +142,7 @@ fun CryptoItem(
         ) {
             Text(
 //                text = price.toString(),
-                text = result.marketCapRank.toString(),
+                text = String.format("%.4f",result.quote.USD.price),
                 fontSize = 30.sp,
                 color = Color.White,
                 modifier = Modifier
@@ -172,7 +167,8 @@ fun SearchScreen(
     viewModel: SearchPageViewModel = viewModel(),
     modifier: Modifier = Modifier
 ){
-    viewModel.getCoins()
+//    viewModel.startSearch()
+    viewModel.getLatestCrypto()
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -185,6 +181,7 @@ fun SearchScreen(
             Modifier.padding(bottom = 20.dp)
         )
         CryptoList(viewModel.searchResult)
+//        , viewModel.info
 
     }
 
