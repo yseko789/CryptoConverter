@@ -1,12 +1,9 @@
 package com.yseko.cryptoconverter
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yseko.cryptoconverter.network.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class SearchPageViewModel: ViewModel() {
