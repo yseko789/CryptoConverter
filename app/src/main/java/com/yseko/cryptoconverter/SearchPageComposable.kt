@@ -1,14 +1,13 @@
 package com.yseko.cryptoconverter
 
+import android.inputmethodservice.Keyboard
 import android.media.MediaCodec
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,12 +23,14 @@ import com.yseko.cryptoconverter.ui.theme.CryptoConverterTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.yseko.cryptoconverter.network.InfoData
 
 import com.yseko.cryptoconverter.network.LatestData
 import com.yseko.cryptoconverter.network.Price
+import com.yseko.cryptoconverter.network.TotalData
 
 
 @Composable
@@ -62,26 +63,19 @@ fun CryptoSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 60.dp)
-
-//            .background(Color.Black)
-
     )
 }
 
 
 @Composable
 fun CryptoList(
-    results: List<LatestData>,
-//    infos: List<InfoData>,
+    totalResult: List<TotalData>,
     modifier: Modifier = Modifier
 ){
     LazyColumn{
-//        items(results){result->
-//            CryptoItem(result, prices[results.indexOf(result)])
-        items(results){result->
+        items(totalResult){data->
             CryptoItem(
-                result = result,
-//                image = infos.first{it.id == result.id}.logo
+                totalData = data
             )
 
 
@@ -91,10 +85,11 @@ fun CryptoList(
 
 @Composable
 fun CryptoItem(
-    result: LatestData,
-//    image: String,
+    totalData: TotalData,
     modifier: Modifier = Modifier
 ){
+    var expandedState by remember { mutableStateOf(false)}
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -105,16 +100,14 @@ fun CryptoItem(
             .background(color = Color.Red)
 
     ){
-//        Image(
-//            //need to use coil to get images from internet
-////            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-//            painter = rememberAsyncImagePainter(model = image),
-//            contentDescription = "icon",
-//            contentScale = ContentScale.FillWidth,
-//            modifier = Modifier
-//                .weight(1f)
-//                .padding(10.dp)
-//        )
+        Image(
+            painter = rememberAsyncImagePainter(model = totalData.logo),
+            contentDescription = "icon",
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .weight(1f)
+                .padding(10.dp)
+        )
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -124,12 +117,12 @@ fun CryptoItem(
         )
         {
             Text(
-                text = result.name,
+                text=totalData.name,
                 color= Color.White,
                 modifier = Modifier
             )
             Text(
-                text = result.symbol,
+                text = totalData.symbol,
                 color= Color.LightGray,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -141,8 +134,7 @@ fun CryptoItem(
                 .weight(3f)
         ) {
             Text(
-//                text = price.toString(),
-                text = String.format("%.4f",result.quote.USD.price),
+                text = String.format("%.3f",totalData.quote.USD.price),
                 fontSize = 30.sp,
                 color = Color.White,
                 modifier = Modifier
@@ -155,11 +147,23 @@ fun CryptoItem(
             modifier = Modifier
                 .weight(1f)
                 .padding(10.dp)
+                .clickable{
+                    expandedState = !expandedState
+                }
+        )
+    }
+    if(expandedState){
+        Text(
+            text = totalData.description,
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(BorderStroke(1.dp, Color.White))
+                .padding(5.dp)
         )
     }
 }
 
-//add parameters to search bar & cryptolist
 
 
 @Composable
@@ -167,8 +171,8 @@ fun SearchScreen(
     viewModel: SearchPageViewModel = viewModel(),
     modifier: Modifier = Modifier
 ){
-//    viewModel.startSearch()
-    viewModel.getLatestCrypto()
+
+    viewModel.getTotalInfo()
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -180,9 +184,9 @@ fun SearchScreen(
             { input -> viewModel.updateSearch(input) },
             Modifier.padding(bottom = 20.dp)
         )
-        CryptoList(viewModel.searchResult)
-//        , viewModel.info
-
+        CryptoList(
+            viewModel.totalResult
+        )
     }
 
 }
