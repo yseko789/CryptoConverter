@@ -11,13 +11,15 @@ import com.yseko.cryptoconverter.network.LatestData
 import kotlinx.coroutines.launch
 
 class ConverterPageViewModel: ViewModel() {
-    val apikey = ""
+    val apikey = "18c453c6-f8d6-40f6-8d61-384c413727fa"
 
     var numInput by mutableStateOf("0")
     var numOutput by mutableStateOf("0")
 
     var searchInputFrom by mutableStateOf("")
     var searchInputTo by mutableStateOf("")
+    var searchInputFromSymbol by mutableStateOf("")
+    var searchInputToSymbol by mutableStateOf("")
 
     var searchLatest = mutableStateListOf<LatestData>()
     var searchFrom = mutableStateListOf<LatestData>()
@@ -37,9 +39,10 @@ class ConverterPageViewModel: ViewModel() {
         println(searchInputFrom)
         println(searchInputTo)
         if(numInput.toDouble() >0 && searchInputFrom.trim() != "" && searchInputTo.trim()!=""){
-            getPrice(searchInputFrom, searchInputTo)
+            getPrice(searchInputFromSymbol, searchInputToSymbol)
         }
-        println("here")
+        println(searchInputFrom)
+        println(searchInputTo)
     }
 
     fun deleteInput(){
@@ -49,45 +52,49 @@ class ConverterPageViewModel: ViewModel() {
             "0"
         }
         if(numInput.toDouble() >0 && searchInputFrom.trim() != "" && searchInputTo.trim()!=""){
-            getPrice(searchInputFrom, searchInputTo)
+            getPrice(searchInputFromSymbol, searchInputToSymbol)
         }else if(numInput.toDouble()== 0.0){
             numOutput = "0"
         }
     }
 
-    fun updateSearchFrom(inputString: String){
+    fun updateSearchFromList(inputString: String) {
+        searchInputFrom = inputString
         searchFrom.clear()
         searchFrom.addAll(
-            searchLatest.filter{
+            searchLatest.filter {
                 it.name.lowercase().startsWith(inputString)
             }
         )
+    }
 
+    fun selectSearchFromList(latest: LatestData){
+        searchInputFrom = latest.name
+        searchInputFromSymbol = latest.symbol
 
-//        searchInputFrom = inputString
-//        if(numInput.toDouble() >0 && searchInputFrom.trim() != "" && searchInputTo.trim()!=""){
-//            getPrice(searchInputFrom, searchInputTo)
-//        }
-//        getCoins(inputString)
+        if(numInput.toDouble() >0 && searchInputFrom.trim() != "" && searchInputTo.trim()!=""){
+            getPrice(searchInputFromSymbol, searchInputToSymbol)
+        }
     }
 
 
 
-    fun updateSearchTo(inputString: String){
+    fun updateSearchToList(inputString: String) {
+        searchInputTo = inputString
         searchTo.clear()
         searchTo.addAll(
-            searchLatest.filter{
+            searchLatest.filter {
                 it.name.lowercase().startsWith(inputString)
             }
         )
+    }
 
-
-
-//        searchInputTo = inputString
-//        if(numInput.toDouble() >0 && searchInputFrom.trim() != "" && searchInputTo.trim()!=""){
-//            getPrice(searchInputFrom, searchInputTo)
-//        }
-//        getCoins(inputString)
+    fun selectSearchToList(latest:LatestData){
+        searchInputTo = latest.name
+        searchInputToSymbol = latest.symbol
+        if(numInput.toDouble() >0 && searchInputFrom.trim() != "" && searchInputTo.trim()!=""){
+            getPrice(searchInputFromSymbol, searchInputToSymbol)
+        }
     }
 
     fun getLatest(){
@@ -95,6 +102,8 @@ class ConverterPageViewModel: ViewModel() {
             try{
                 searchLatest.clear()
                 searchLatest.addAll(CoinMarketCapApi.retrofitService.getLatest(apikey).data)
+                searchTo.addAll(searchLatest)
+                searchFrom.addAll(searchLatest)
             }catch (e:Exception){
                 println(e)
             }

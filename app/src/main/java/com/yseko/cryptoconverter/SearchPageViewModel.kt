@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 
 class SearchPageViewModel: ViewModel() {
 
-    private val apikey = ""
+    private val apikey = "18c453c6-f8d6-40f6-8d61-384c413727fa"
     var searchInput by mutableStateOf("")
     val totalResult = mutableStateListOf<TotalData>()
 

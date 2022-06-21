@@ -48,14 +48,14 @@ fun CryptoSearchBar(
                 contentDescription = null
             )
         },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            backgroundColor = Color.Black,
-            textColor = Color.White,
-            placeholderColor = Color.LightGray,
-            leadingIconColor = Color.White,
-            focusedBorderColor = Color.White,
-            unfocusedBorderColor = Color.White
-        ),
+//        colors = TextFieldDefaults.outlinedTextFieldColors(
+//            backgroundColor = Color.Black,
+//            textColor = Color.White,
+//            placeholderColor = Color.LightGray,
+//            leadingIconColor = Color.White,
+//            focusedBorderColor = Color.White,
+//            unfocusedBorderColor = Color.White
+//        ),
         placeholder = {
             Text(stringResource(id = R.string.search_placeholder))
         },
@@ -73,9 +73,13 @@ fun CryptoList(
     modifier: Modifier = Modifier
 ){
     LazyColumn{
-        items(totalResult){data->
+        items(totalResult.take(30)){data->
             CryptoItem(
                 totalData = data
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(5.dp)
             )
 
 
@@ -90,75 +94,95 @@ fun CryptoItem(
 ){
     var expandedState by remember { mutableStateOf(false)}
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding(vertical = 2.dp)
-            .fillMaxWidth()
-            .height(60.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(color = Color.Red)
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        elevation = 8.dp
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .padding(vertical = 2.dp)
+                .fillMaxWidth()
+                .height(60.dp)
+//                .clip(RoundedCornerShape(10.dp))
+//            .background(color = Color.Red)
 
-    ){
-        Image(
-            painter = rememberAsyncImagePainter(model = totalData.logo),
-            contentDescription = "icon",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .weight(1f)
-                .padding(10.dp)
-        )
-        Column (
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(horizontal = 10.dp)
-                .weight(2f)
-        )
-        {
-            Text(
-                text=totalData.name,
-                color= Color.White,
-                modifier = Modifier
-            )
-            Text(
-                text = totalData.symbol,
-                color= Color.LightGray,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-            )
-        }
-        Box(contentAlignment = Alignment.CenterEnd,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(3f)
         ) {
-            Text(
-                text = String.format("%.3f",totalData.quote.USD.price),
-                fontSize = 30.sp,
-                color = Color.White,
+            Image(
+                painter =
+                if(expandedState){
+                    painterResource(id = R.drawable.ic_baseline_expand_less_24)
+                }else{
+                    painterResource(id = R.drawable.ic_baseline_expand_more_24)
+                     },
+                contentDescription = "expand",
                 modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        expandedState = !expandedState
+                    }
+            )
+            Image(
+                painter = rememberAsyncImagePainter(model = totalData.logo),
+                contentDescription = "icon",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(10.dp)
+            )
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 10.dp)
+                    .weight(2f)
+            )
+            {
+                Text(
+                    text = totalData.name,
+//                color= Color.White,
+                    modifier = Modifier
+                )
+                Text(
+                    text = totalData.symbol,
+//                color= Color.LightGray,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                )
+            }
+            Box(
+                contentAlignment = Alignment.CenterEnd,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(3f)
+            ) {
+                Text(
+                    text = String.format("%.3f", totalData.quote.USD.price),
+                    fontSize = 20.sp,
+//                color = Color.White,
+                    modifier = Modifier
+                )
+            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_baseline_star_outline_24),
+                contentDescription = "star",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(10.dp)
+                    .clickable {
+                        expandedState = !expandedState
+                    }
             )
         }
-        Image(
-            painter = painterResource(id = R.drawable.ic_baseline_star_outline_24),
-            contentDescription = "star",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .weight(1f)
-                .padding(10.dp)
-                .clickable{
-                    expandedState = !expandedState
-                }
-        )
     }
     if(expandedState){
         Text(
             text = totalData.description,
-            color = Color.White,
+//            color = Color.White,
             modifier = Modifier
                 .fillMaxWidth()
-                .border(BorderStroke(1.dp, Color.White))
+//                .border(BorderStroke(1.dp, Color.White))
                 .padding(5.dp)
         )
     }
@@ -176,9 +200,10 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .background(color = Color.Black)
+//            .background(color = Color.Black)
             .padding(20.dp)
     ) {
+        Spacer(modifier = Modifier.height(40.dp))
         CryptoSearchBar(
             viewModel.searchInput,
             { input -> viewModel.updateSearch(input) },

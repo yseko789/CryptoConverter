@@ -29,7 +29,7 @@ import com.yseko.cryptoconverter.ui.theme.CryptoConverterTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yseko.cryptoconverter.network.LatestData
 import androidx.compose.foundation.lazy.items
-
+import kotlin.math.exp
 
 
 @Composable
@@ -37,19 +37,25 @@ fun ConverterScreen(
     viewModel: ConverterPageViewModel = viewModel(),
     modifier: Modifier = Modifier
 ){
+    viewModel.getLatest()
     Column(
         modifier = modifier
             .fillMaxHeight()
-            .background(Color.Black)
+//            .background(Color.Black)
     ) {
+        Spacer(modifier = Modifier.height(40.dp))
+
         Display(
             viewModel.numInput,
             viewModel.numOutput,
             viewModel.searchInputFrom,
             viewModel.searchInputTo,
-            { search -> viewModel.updateSearchFrom(search) },
-            {search ->viewModel.updateSearchTo(search)},
-            viewModel.searchLatest,
+            {input->viewModel.updateSearchFromList(input)},
+            {input->viewModel.updateSearchToList(input)},
+            { latest -> viewModel.selectSearchFromList(latest) },
+            {latest ->viewModel.selectSearchToList(latest)},
+            viewModel.searchFrom,
+            viewModel.searchTo,
             modifier = Modifier
                 .weight(7f)
         )
@@ -59,7 +65,7 @@ fun ConverterScreen(
             modifier = Modifier
                 .weight(1f)
         )
-        Divider(
+        Spacer(
             modifier = Modifier
                 .weight(1f)
         )
@@ -73,9 +79,12 @@ fun Display(
     outputNum: String,
     inputCryptoFrom: String,
     inputCryptoTo: String,
-    updateSearchFrom: (String)->Unit,
-    updateSearchTo: (String)->Unit,
-    searchResults: List<LatestData>,
+    updateSearchFromList: (String)->Unit,
+    updateSearchToList: (String)->Unit,
+    selectSearchFromList: (LatestData)->Unit,
+    selectSearchToList:(LatestData)->Unit,
+    searchFrom: List<LatestData>,
+    searchTo: List<LatestData>,
     modifier: Modifier = Modifier
 //        .padding(50.dp)
 //        .fillMaxWidth()
@@ -87,8 +96,9 @@ fun Display(
         CryptoPicker(
             label = "From",
             input = inputCryptoFrom,
-            updateInput =updateSearchFrom,
-            searchResults = searchResults,
+            updateInput =updateSearchFromList,
+            selectInput = selectSearchFromList,
+            searchResults = searchFrom,
             modifier = Modifier
                 .weight(1f)
         )
@@ -100,8 +110,9 @@ fun Display(
         CryptoPicker(
             label = "To",
             input = inputCryptoTo,
-            updateInput = updateSearchTo,
-            searchResults = searchResults,
+            updateInput = updateSearchToList,
+            selectInput = selectSearchToList,
+            searchResults = searchTo,
             modifier = Modifier
                 .weight(1f)
         )
@@ -124,7 +135,7 @@ fun CryptoAmount(
     ) {
         Text(
             text = input,
-            color = Color.White,
+//            color = Color.White,
             fontSize = 40.sp,
             textAlign = TextAlign.Center,
             modifier = modifier
@@ -134,39 +145,67 @@ fun CryptoAmount(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CryptoPicker(
     label: String,
     input: String,
     updateInput: (String)->Unit,
+    selectInput: (LatestData)->Unit,
     searchResults: List<LatestData>,
     modifier: Modifier = Modifier
 ){
+
+    var expanded by remember{ mutableStateOf(false)}
+//    var selectedOptionText by remember { mutableStateOf("")}
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {expanded = !expanded}
+    ) {
         OutlinedTextField(
+//            value = selectedOptionText,
             value = input,
-            onValueChange = { updateInput(it) },
-            label = { Text(label) },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color.Black,
-                textColor = Color.White,
-                placeholderColor = Color.LightGray,
-                focusedBorderColor = Color.White,
-                unfocusedBorderColor = Color.White,
-                focusedLabelColor = Color.White,
-                unfocusedLabelColor = Color.White
-            ),
+            onValueChange = {
+                updateInput(it)
+                expanded = true },
+            label = {Text(label)},
+//            colors = TextFieldDefaults.outlinedTextFieldColors(
+//                backgroundColor = Color.Black,
+//                textColor = Color.White,
+//                placeholderColor = Color.LightGray,
+//                focusedBorderColor = Color.White,
+//                unfocusedBorderColor = Color.White,
+//                focusedLabelColor = Color.White,
+//                unfocusedLabelColor = Color.White
+//            ),
             shape = RoundedCornerShape(10.dp),
-            modifier = modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
-        LazyColumn{
-            items(searchResults){search->
-                Text(
-                    text = search.name,
-                    color=Color.White
-                )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false},
+            modifier= Modifier
+                .fillMaxWidth()
+        ) {
+            searchResults.take(5).forEach{
+                DropdownMenuItem(
+                    onClick = {
+                        selectInput(it)
+                        expanded = false
+                    }
+                ) {
+                    Text(
+                        text = it.name,
+//                        color = Color.White,
+                        modifier = Modifier
+//                            .background(Color.Black)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
+    }
 
 }
 
@@ -176,90 +215,103 @@ fun NumPad(
     onDeleteClick: (String)->Unit,
     modifier: Modifier = Modifier
 ){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp)
-    ) {
-        Row(
+
+        Column(
             modifier = Modifier
-        ){
-            NumKey(
-                num = "1",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f)
-            )
-            NumKey(
-                num = "2",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "3",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-        }
-        Row(
-            modifier = Modifier
-        ){
-            NumKey(
-                num = "4",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "5",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "6",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-        }
-        Row(
-            modifier = Modifier
-        ){
-            NumKey(
-                num = "7",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "8",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "9",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-        }
-        Row(
-            modifier = Modifier
-        ){
-            NumKey(
-                num = ".",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "0",
-                onClick= onNumClick,
-                modifier
-                    .weight(1f))
-            NumKey(
-                num = "DLT",
-                onClick= onDeleteClick,
-                modifier
-                    .weight(1f))
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp)
+        ) {
+            Row(
+                modifier = Modifier
+            ) {
+                NumKey(
+                    num = "1",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "2",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "3",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier
+            ) {
+                NumKey(
+                    num = "4",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "5",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "6",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier
+            ) {
+                NumKey(
+                    num = "7",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "8",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "9",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier
+            ) {
+                NumKey(
+                    num = ".",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "0",
+                    onClick = onNumClick,
+                    modifier
+                        .weight(1f)
+                )
+                NumKey(
+                    num = "DLT",
+                    onClick = onDeleteClick,
+                    modifier
+                        .weight(1f)
+                )
+            }
+
         }
 
-    }
 
 }
 
@@ -269,15 +321,16 @@ fun NumKey(
     onClick: (String)->Unit,
     modifier: Modifier = Modifier
 ){
+
     Box(
         contentAlignment= Alignment.Center,
         modifier = modifier
             .aspectRatio(1f)
             .clickable { onClick(num) },
-    ){
+    ) {
         Text(
             text = num,
-            color = colorResource(id = R.color.moss_green),
+//            color = colorResource(id = R.color.moss_green),
             fontSize = 20.sp
         )
     }
