@@ -17,5 +17,8 @@ fun BottomNavGraph(navController: NavHostController){
         composable(route=BottomNavBar.Converter.route){
             ConverterScreen()
         }
+        composable(route =BottomNavBar.MyConversions.route){
+            MyConversionsScreen()
+        }
     }
 }

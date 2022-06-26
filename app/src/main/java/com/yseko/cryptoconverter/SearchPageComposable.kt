@@ -2,6 +2,7 @@ package com.yseko.cryptoconverter
 
 import android.inputmethodservice.Keyboard
 import android.media.MediaCodec
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,14 +49,6 @@ fun CryptoSearchBar(
                 contentDescription = null
             )
         },
-//        colors = TextFieldDefaults.outlinedTextFieldColors(
-//            backgroundColor = Color.Black,
-//            textColor = Color.White,
-//            placeholderColor = Color.LightGray,
-//            leadingIconColor = Color.White,
-//            focusedBorderColor = Color.White,
-//            unfocusedBorderColor = Color.White
-//        ),
         placeholder = {
             Text(stringResource(id = R.string.search_placeholder))
         },
@@ -70,12 +63,14 @@ fun CryptoSearchBar(
 @Composable
 fun CryptoList(
     totalResult: List<TotalData>,
+//    addCrypto: (Int)->Unit,
     modifier: Modifier = Modifier
 ){
     LazyColumn{
         items(totalResult.take(30)){data->
             CryptoItem(
-                totalData = data
+                totalData = data,
+//                {id->addCrypto(id)}
             )
             Spacer(
                 modifier = Modifier
@@ -93,7 +88,6 @@ fun CryptoItem(
     modifier: Modifier = Modifier
 ){
     var expandedState by remember { mutableStateOf(false)}
-
     Surface(
         shape = RoundedCornerShape(10.dp),
         elevation = 8.dp
@@ -104,9 +98,6 @@ fun CryptoItem(
                 .padding(vertical = 2.dp)
                 .fillMaxWidth()
                 .height(60.dp)
-//                .clip(RoundedCornerShape(10.dp))
-//            .background(color = Color.Red)
-
         ) {
             Image(
                 painter =
@@ -155,6 +146,7 @@ fun CryptoItem(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(3f)
+                    .padding(horizontal = 10.dp)
             ) {
                 Text(
                     text = String.format("%.3f", totalData.quote.USD.price),
@@ -163,26 +155,17 @@ fun CryptoItem(
                     modifier = Modifier
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.ic_baseline_star_outline_24),
-                contentDescription = "star",
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(10.dp)
-                    .clickable {
-                        expandedState = !expandedState
-                    }
-            )
         }
     }
-    if(expandedState){
+    AnimatedVisibility(
+        visible = expandedState,
+        enter = expandVertically(),
+        exit = shrinkVertically()
+    ) {
         Text(
             text = totalData.description,
-//            color = Color.White,
             modifier = Modifier
                 .fillMaxWidth()
-//                .border(BorderStroke(1.dp, Color.White))
                 .padding(5.dp)
         )
     }
@@ -210,7 +193,8 @@ fun SearchScreen(
             Modifier.padding(bottom = 20.dp)
         )
         CryptoList(
-            viewModel.totalResult
+            viewModel.totalResult,
+//            {id -> viewModel.addFavorite(id)}
         )
     }
 

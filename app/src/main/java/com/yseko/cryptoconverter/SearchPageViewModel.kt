@@ -1,16 +1,21 @@
 package com.yseko.cryptoconverter
 
 import androidx.compose.runtime.*
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.yseko.cryptoconverter.data.CryptoDao
 import com.yseko.cryptoconverter.network.*
 import kotlinx.coroutines.launch
 
-class SearchPageViewModel: ViewModel() {
+class SearchPageViewModel(): ViewModel() {
 
-    private val apikey = "18c453c6-f8d6-40f6-8d61-384c413727fa"
+    private val apikey = ""
     var searchInput by mutableStateOf("")
     val totalResult = mutableStateListOf<TotalData>()
+
+//    val allTimers: LiveData<List<Int>> = cryptoDao.getAllCryptoId().asLiveData()
 
     fun updateSearch(inputString: String) {
         searchInput = inputString
@@ -43,6 +48,13 @@ class SearchPageViewModel: ViewModel() {
                     }
                 }
             }
+//            totalResult.sortBy{allTimers.value.contains(it.id)}
         }
     }
+
+//    fun addFavorite(id: Int){
+//        viewModelScope.launch {
+//            cryptoDao.insert(id)
+//        }
+//    }
 }

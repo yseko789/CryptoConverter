@@ -20,5 +20,10 @@ sealed class BottomNavBar(
         title="Converter",
         icon = R.drawable.ic_baseline_compare_arrows_24
     )
+    object MyConversions: BottomNavBar(
+        route = "myConversions",
+        title = "My Conversions",
+        icon = R.drawable.ic_baseline_star_24
+    )
 
 }

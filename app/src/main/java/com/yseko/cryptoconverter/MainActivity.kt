@@ -56,7 +56,8 @@ fun CryptoConverterApp(
 fun BottomBar(navController: NavHostController){
     val screens = listOf(
         BottomNavBar.Search,
-        BottomNavBar.Converter
+        BottomNavBar.Converter,
+        BottomNavBar.MyConversions
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination

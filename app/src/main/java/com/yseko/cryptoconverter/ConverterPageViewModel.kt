@@ -11,7 +11,7 @@ import com.yseko.cryptoconverter.network.LatestData
 import kotlinx.coroutines.launch
 
 class ConverterPageViewModel: ViewModel() {
-    val apikey = "18c453c6-f8d6-40f6-8d61-384c413727fa"
+    val apikey = ""
 
     var numInput by mutableStateOf("0")
     var numOutput by mutableStateOf("0")
@@ -109,26 +109,7 @@ class ConverterPageViewModel: ViewModel() {
             }
         }
     }
-//
-//    fun getConvertedPrice(id: String, vs: String){
-//        viewModelScope.launch {
-//            try{
-//                numOutput = GeckoApi.retrofitService.getPrice(id, vs)[id]?.get(vs)?.toString()!!
-//            }catch (e: Exception){
-//                println(e)
-//            }
-//        }
-//    }
 
-//    fun getPrice(id: String, convertId: String){
-//        viewModelScope.launch {
-//            try{
-//                numOutput = CoinMarketCapApi.retrofitService.getPrice(apikey, id, convertId).data["1"]?.quote?.USD?.price.toString()
-//            }catch (e: Exception){
-//                println(e)
-//            }
-//        }
-//    }
 private fun getPrice(symbol: String, convert: String){
         viewModelScope.launch {
             try{
