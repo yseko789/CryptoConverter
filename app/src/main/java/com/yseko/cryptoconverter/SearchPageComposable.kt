@@ -142,11 +142,10 @@ fun CryptoItem(
                 )
             }
             Box(
-                contentAlignment = Alignment.CenterEnd,
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(3f)
-                    .padding(horizontal = 10.dp)
             ) {
                 Text(
                     text = String.format("%.3f", totalData.quote.USD.price),
